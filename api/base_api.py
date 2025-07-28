@@ -1,8 +1,9 @@
 import requests
 import logging
+from urllib.parse import urljoin
 
 class BaseAPI:
-    def __init__(self, base_url, api_key=None, default_timeout=10):
+    def __init__(self, base_url: str, api_key: str = None, default_timeout: int = 10):
         self.base_url = base_url
         self.session = requests.Session()
         self.default_timeout = default_timeout
@@ -10,8 +11,8 @@ class BaseAPI:
             self.session.headers.update({"x-api-key": api_key})
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def request(self, method, path, timeout=None, **kwargs):
-        url = self.base_url + path
+    def request(self, method: str, path: str, timeout: int = None, **kwargs) -> requests.Response:
+        url = urljoin(self.base_url, path)
         timeout = timeout or self.default_timeout
         self.logger.info(f"Request: {method} {url} | timeout={timeout}")
         try:
@@ -32,11 +33,11 @@ class BaseAPI:
             self.logger.error(f"Request failed: {method} {url} | error: {e}")
             raise AssertionError(f"Request failed: {e}")
 
-    def get(self, path, **kwargs):
+    def get(self, path: str, **kwargs) -> requests.Response:
         return self.request("GET", path, **kwargs)
-    def post(self, path, **kwargs):
+    def post(self, path: str, **kwargs) -> requests.Response:
         return self.request("POST", path, **kwargs)
-    def delete(self, path, **kwargs):
+    def delete(self, path: str, **kwargs) -> requests.Response:
         return self.request("DELETE", path, **kwargs)
-    def put(self, path, **kwargs):
+    def put(self, path: str, **kwargs) -> requests.Response:
         return self.request("PUT", path, **kwargs)
